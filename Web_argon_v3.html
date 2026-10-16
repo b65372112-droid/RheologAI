@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reolog.IA — Gemelo Digital para Betunes Asfálticos Modificados</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: '#0B0F17',
+                        slateCard: '#151C28',
+                        slateBorder: '#232F42',
+                        cyanLab: '#0EA5E9',
+                        amberBitumen: '#F59E0B',
+                        emeraldValid: '#10B981',
+                        violetLas: '#8B5CF6'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js CDN para el Gráfico de Radar (Opción A) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0B0F17;
+            --bg-card: #151C28;
+            --border-color: #232F42;
+            --text-main: #F8FAFC;
+        }
+        html.light {
+            --bg-main: #F1F5F9;
+            --bg-card: #FFFFFF;
+            --border-color: #CBD5E1;
+            --text-main: #0F172A;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.25s ease, color 0.25s ease;
+            overflow-x: hidden;
+        }
+
+        .bg-tech-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.22);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #0EA5E9;
+            border: 2px solid #FFFFFF;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.6);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        input[type=range].amber-slider::-webkit-slider-thumb {
+            background: #F59E0B;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        }
+        input[type=range].violet-slider::-webkit-slider-thumb {
+            background: #8B5CF6;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+        }
+
+        .lab-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.85rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.35);
+            transition: border-color 0.2s ease, background-color 0.25s ease;
+        }
+        html.light .lab-card {
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.07);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-tech-grid min-h-screen flex flex-col selection:bg-cyanLab selection:text-white">
+
+    <!-- ================= CABECERA ================= -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-obsidian/85 border-b border-slate-800/80">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Identidad Reolog.IA -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-sky-600 to-amber-500 p-[1.5px] shadow-lg shadow-cyan-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center font-display font-bold text-cyan-400 text-lg">
+                        R
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center flex-wrap gap-2">
+                        <h1 class="font-display font-bold text-xl tracking-tight text-white">
+                            Reolog<span class="text-cyan-400">.IA</span>
+                        </h1>
+                        <span class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 font-semibold">
+                            Prototipo
+                        </span>
+                        <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">
+                            Ligante Base: Betún B50/70 RLESA
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">Gemelo Digital para Betunes Asfálticos Modificados</p>
+                </div>
+            </div>
+
+            <!-- Estado de Conexión con MATLAB, Configuración Remota y Tema -->
+            <div class="flex items-center flex-wrap gap-2.5">
+                <div id="api-status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700/80 text-xs font-mono">
+                    <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="status-text" class="text-slate-300">Motor MATLAB (<span id="lbl-endpoint-short">127.0.0.1:5000</span>)</span>
+                </div>
+
+                <!-- Botón para configurar IP / Túnel Ngrok para uso compartido -->
+                <button type="button" onclick="cambiarServidorAPI()" class="px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/80 text-xs font-mono text-slate-300 hover:text-cyan-400 hover:border-cyan-500/50 transition-colors" title="Permite conectar a una IP de red local o URL de Ngrok para compartir el prototipo">
+                    ⚙️ Red / URL
+                </button>
+
+                <!-- Botón Tema Claro / Oscuro -->
+                <button type="button" id="theme-toggle" onclick="toggleTheme()" class="px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/80 text-xs font-mono text-slate-300 hover:text-cyan-400 hover:border-cyan-500/50 transition-colors">
+                    Tema Claro / Oscuro
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 flex-1 flex flex-col gap-6">
+
+        <!-- BLOQUE SUPERIOR DE AVISOS (MISMA LONGITUD Y ANCHO COMPLETO) -->
+        <div class="flex flex-col gap-3">
+            <!-- 1. Nota Técnica sobre el Betún Base -->
+            <div class="w-full p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2.5 text-amber-200">
+                    <span class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-mono font-bold uppercase">Nota Técnica</span>
+                    <span>Todos los modelos predictivos de este gemelo digital han sido entrenados utilizando como ligante base <strong>Betún B50/70 RLESA</strong>.</span>
+                </div>
+                <span class="font-mono text-[11px] text-amber-300/80">DSR &bull; MSCR &bull; LAS</span>
+            </div>
+
+            <!-- 2. Panel de Estado de la Predicción Reológica (Justo debajo y misma longitud) -->
+            <div id="caja-resultado" class="w-full lab-card p-4 border-l-4 border-l-cyan-400 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div id="res-spinner" class="hidden w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shrink-0"></div>
+                    <div>
+                        <h3 id="res-status-title" class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold">
+                            Panel de Predicción Reológica Listo
+                        </h3>
+                        <p id="res-status-desc" class="text-xs text-slate-400">
+                            Introduce los parámetros en los paneles inferiores y pulsa "Ejecutar Predicción IA" para consultar los modelos en MATLAB.
+                        </p>
+                    </div>
+                </div>
+                <span id="res-timestamp" class="text-[11px] font-mono text-slate-500">--:--:--</span>
+            </div>
+        </div>
+
+        <!-- ================= SECCIÓN SUPERIOR: PANELES DE ENTRADA (01 + 02 A LA IZQUIERDA | 03 A LA DERECHA) ================= -->
+        <form id="form-reologia" onsubmit="event.preventDefault(); ejecutarPrediccionReal();" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- COLUMNA IZQUIERDA (6 cols): PANEL 01 (MÁSTICO) + PANEL 02 (ADITIVOS) -->
+            <div class="lg:col-span-6 flex flex-col gap-6 justify-between">
+                
+                <!-- PANEL 01: COMPOSICIÓN DEL MÁSTICO (% SOBRE EL VOLUMEN) -->
+                <div class="lab-card p-5 flex-1">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-md bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 font-mono text-xs flex items-center justify-center font-bold">01</span>
+                            <h2 class="font-display font-semibold text-sm uppercase tracking-wider text-slate-200">
+                                Composición del Mástico (% sobre el volumen)
+                            </h2>
+                        </div>
+                        <span id="badge-suma-vol" class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                            Balance = 100.0%
+                        </span>
+                    </div>
+
+                    <!-- Barra de Distribución Volumétrica -->
+                    <div class="mb-5">
+                        <div class="flex justify-between text-[11px] font-mono text-slate-400 mb-1.5">
+                            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></i>Ce: <strong id="bar-label-ce" class="text-slate-200">0.0%</strong></span>
+                            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-indigo-400 inline-block"></i>CaCO<sub>3</sub>: <strong id="bar-label-caco3" class="text-slate-200">0.0%</strong></span>
+                            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-400 inline-block"></i>ReSe: <strong id="bar-label-rese" class="text-slate-200">0.0%</strong></span>
+                            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></i>FR (Base): <strong id="bar-label-fr" class="text-emerald-400">100.0%</strong></span>
+                        </div>
+                        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden flex border border-slate-700/80 p-0.5 gap-0.5">
+                            <div id="bar-seg-ce" class="h-full bg-cyan-400 transition-all duration-200 rounded-l-full" style="width: 0%"></div>
+                            <div id="bar-seg-caco3" class="h-full bg-indigo-400 transition-all duration-200" style="width: 0%"></div>
+                            <div id="bar-seg-rese" class="h-full bg-amber-400 transition-all duration-200" style="width: 0%"></div>
+                            <div id="bar-seg-fr" class="h-full bg-emerald-500/80 transition-all duration-200 rounded-r-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Mástico -->
+                    <div class="space-y-3.5">
+                        <!-- % Ce -->
+                        <div class="p-3 rounded-lg bg-slate-900/55 border border-slate-800/90">
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="ce" class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                                    % Ce <span class="text-slate-500 font-normal">(Ceniza de biomasa)</span>
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="ce" value="0" step="0.1" min="0" max="100" 
+                                        oninput="syncInput('ce', this.value)"
+                                        class="w-20 px-2 py-1 text-right font-mono text-xs rounded bg-slate-950 border border-slate-700 text-cyan-400 focus:outline-none focus:border-cyan-400">
+                                    <span class="text-xs font-mono text-slate-500">%</span>
+                                </div>
+                            </div>
+                            <input type="range" id="ce-range" value="0" step="0.5" min="0" max="100" 
+                                oninput="syncRange('ce', this.value)" class="w-full">
+                        </div>
+
+                        <!-- % CaCO3 -->
+                        <div class="p-3 rounded-lg bg-slate-900/55 border border-slate-800/90">
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="caco3" class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                                    % CaCO<sub>3</sub> <span class="text-slate-500 font-normal">(Carbonato)</span>
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="caco3" value="0" step="0.1" min="0" max="100" 
+                                        oninput="syncInput('caco3', this.value)"
+                                        class="w-20 px-2 py-1 text-right font-mono text-xs rounded bg-slate-950 border border-slate-700 text-indigo-400 focus:outline-none focus:border-indigo-400">
+                                    <span class="text-xs font-mono text-slate-500">%</span>
+                                </div>
+                            </div>
+                            <input type="range" id="caco3-range" value="0" step="0.5" min="0" max="100" 
+                                oninput="syncRange('caco3', this.value)" class="w-full">
+                        </div>
+
+                        <!-- % ReSe -->
+                        <div class="p-3 rounded-lg bg-slate-900/55 border border-slate-800/90">
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="rese" class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    % ReSe <span class="text-slate-500 font-normal">(Residuo Secundario)</span>
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="rese" value="0" step="0.1" min="0" max="100" 
+                                        oninput="syncInput('rese', this.value)"
+                                        class="w-20 px-2 py-1 text-right font-mono text-xs rounded bg-slate-950 border border-slate-700 text-amber-400 focus:outline-none focus:border-amber-400">
+                                    <span class="text-xs font-mono text-slate-500">%</span>
+                                </div>
+                            </div>
+                            <input type="range" id="rese-range" value="0" step="0.5" min="0" max="100" 
+                                oninput="syncRange('rese', this.value)" class="w-full amber-slider">
+                        </div>
+
+                        <!-- % FR (Filler de recuperación - Base Balance) -->
+                        <div class="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30 flex items-center justify-between">
+                            <div>
+                                <label for="fr" class="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    % FR (Filler de recuperación - Base Balance)
+                                </label>
+                                <span class="text-[11px] text-slate-400">Cálculo automático: 100% &minus; (Ce + CaCO<sub>3</sub> + ReSe)</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <input type="number" id="fr" value="100.0" readonly
+                                    class="w-20 px-2.5 py-1 text-right font-mono font-bold text-sm rounded bg-slate-950/90 border border-emerald-500/40 text-emerald-400 cursor-not-allowed">
+                                <span class="text-xs font-mono text-emerald-400">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerta de exceso de volumen -->
+                    <div id="aviso-mastico" class="hidden mt-3 p-3 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-medium flex items-center gap-2">
+                        <span>⚠️ La suma de Ce, CaCO<sub>3</sub> y ReSe supera el 100%.</span>
+                    </div>
+                </div>
+
+                <!-- PANEL 02: ADITIVOS SOBRE PESO DE BETÚN -->
+                <div class="lab-card p-5">
+                    <div class="flex items-center justify-between mb-3.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-400 font-mono text-xs flex items-center justify-center font-bold">02</span>
+                            <h2 class="font-display font-semibold text-sm uppercase tracking-wider text-slate-200">
+                                Aditivos (% sobre el peso del betún B50/70 RLESA)
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <!-- % AD4 -->
+                        <div class="p-3 rounded-lg bg-slate-900/55 border border-slate-800/90">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="ad4" class="text-xs font-medium text-slate-300">% AD4 <span class="text-slate-500">(Aditivo 4)</span></label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="ad4" value="0" step="0.1" min="0" max="100"
+                                        oninput="syncInput('ad4', this.value)"
+                                        class="w-16 px-2 py-1 text-right font-mono text-xs rounded bg-slate-950 border border-slate-700 text-amber-400 focus:outline-none focus:border-amber-400">
+                                    <span class="text-xs font-mono text-slate-500">%</span>
+                                </div>
+                            </div>
+                            <input type="range" id="ad4-range" value="0" step="0.2" min="0" max="20"
+                                oninput="syncRange('ad4', this.value)" class="w-full amber-slider">
+                        </div>
+
+                        <!-- % BO -->
+                        <div class="p-3 rounded-lg bg-slate-900/55 border border-slate-800/90">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="bo" class="text-xs font-medium text-slate-300">% BO <span class="text-slate-500">(Bio-Oil)</span></label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="bo" value="0" step="0.1" min="0" max="100"
+                                        oninput="syncInput('bo', this.value)"
+                                        class="w-16 px-2 py-1 text-right font-mono text-xs rounded bg-slate-950 border border-slate-700 text-amber-400 focus:outline-none focus:border-amber-400">
+                                    <span class="text-xs font-mono text-slate-500">%</span>
+                                </div>
+                            </div>
+                            <input type="range" id="bo-range" value="0" step="0.2" min="0" max="20"
+                                oninput="syncRange('bo', this.value)" class="w-full amber-slider">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA (6 cols): PANEL 03 (AL LADO DEL PANEL 01) -->
+            <div class="lg:col-span-6 flex flex-col">
+                <div class="lab-card p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-md bg-violet-500/15 border border-violet-500/40 text-violet-400 font-mono text-xs flex items-center justify-center font-bold">03</span>
+                                <h2 class="font-display font-semibold text-sm uppercase tracking-wider text-slate-200">
+                                    Condiciones del Ensayo y Estado
+                                </h2>
+                            </div>
+                            <span class="text-[11px] font-mono text-slate-400">Parámetros Operativos</span>
+                        </div>
+
+                        <!-- Selector Estado Original vs USAT -->
+                        <div class="mb-5">
+                            <label class="text-xs font-medium text-slate-400 block mb-2">Estado del Mástico / Betún:</label>
+                            <select id="estado" class="hidden" onchange="validarFormulario()">
+                                <option value="Original" selected>Original</option>
+                                <option value="USAT">USAT</option>
+                            </select>
+                            <div class="grid grid-cols-2 gap-2.5 p-1 bg-slate-950 rounded-lg border border-slate-800">
+                                <button type="button" id="btn-estado-orig" onclick="seleccionarEstado('Original')"
+                                    class="py-2.5 px-3 rounded-md text-xs font-semibold transition-all bg-cyan-500 text-slate-950 shadow">
+                                    Original
+                                </button>
+                                <button type="button" id="btn-estado-usat" onclick="seleccionarEstado('USAT')"
+                                    class="py-2.5 px-3 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-white">
+                                    USAT
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Temperatura -->
+                        <div class="p-4 rounded-lg bg-slate-900/60 border border-slate-800 mb-5">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="temp" class="text-xs font-medium text-slate-300">
+                                    Temperatura <span class="text-slate-500">(20&deg;C a 80&deg;C)</span>
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="temp" value="25" step="1" min="20" max="80"
+                                        oninput="syncInput('temp', this.value)"
+                                        class="w-20 px-2 py-1 text-right font-mono text-sm font-bold rounded bg-slate-950 border border-slate-700 text-cyan-400 focus:outline-none">
+                                    <span class="text-xs font-mono text-slate-400">&deg;C</span>
+                                </div>
+                            </div>
+                            <input type="range" id="temp-range" value="25" step="1" min="20" max="80"
+                                oninput="syncRange('temp', this.value)" class="w-full mb-1">
+                            
+                            <!-- Escala lineal de Temperatura proporcional (20 a 80°C) -->
+                            <div class="relative h-4 text-[10px] font-mono text-slate-500 mb-3 select-none">
+                                <span class="absolute left-0">20&deg;C</span>
+                                <span class="absolute -translate-x-1/2" style="left: 16.67%;">30&deg;C</span>
+                                <span class="absolute -translate-x-1/2" style="left: 50%;">50&deg;C</span>
+                                <span class="absolute -translate-x-1/2" style="left: 66.67%;">60&deg;C</span>
+                                <span class="absolute right-0">80&deg;C</span>
+                            </div>
+
+                            <!-- Indicadores visuales de modelos activos según Temperatura -->
+                            <div class="space-y-2 pt-3 border-t border-slate-800/80 text-[11px] font-mono">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400">Modelos activos a esta temperatura:</span>
+                                    <span id="temp-zone-hint" class="text-cyan-400">LAS + DSR</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 pt-1">
+                                    <div id="pill-dsr" class="px-2 py-1.5 rounded border text-center transition-all bg-cyan-500/15 border-cyan-500/50 text-cyan-300">
+                                        DSR (20–80&deg;C) ✓
+                                    </div>
+                                    <div id="pill-las" class="px-2 py-1.5 rounded border text-center transition-all bg-violet-500/15 border-violet-500/50 text-violet-300">
+                                        LAS (20–25&deg;C) ✓
+                                    </div>
+                                    <div id="pill-mscr" class="px-2 py-1.5 rounded border text-center transition-all bg-slate-900 border-slate-800 text-slate-500">
+                                        MSCR (30–80&deg;C) ✕
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Frecuencia (Sin "DSR", con 2 decimales y escala proporcional exacta) -->
+                        <div class="p-4 rounded-lg bg-slate-900/60 border border-slate-800">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="freq" class="text-xs font-medium text-slate-300">
+                                    Frecuencia <span class="text-slate-500">(0.1 Hz a 30 Hz)</span>
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="freq" value="10" step="0.01" min="0.1" max="30"
+                                        oninput="syncInput('freq', this.value)"
+                                        class="w-24 px-2 py-1 text-right font-mono text-sm font-bold rounded bg-slate-950 border border-slate-700 text-violet-400 focus:outline-none focus:border-violet-400">
+                                    <span class="text-xs font-mono text-slate-400">Hz</span>
+                                </div>
+                            </div>
+
+                            <!-- Barra interactiva con step="0.01" -->
+                            <input type="range" id="freq-range" value="10" step="0.01" min="0.1" max="30"
+                                oninput="syncRange('freq', this.value)" class="w-full violet-slider mb-1">
+
+                            <!-- Marcas de posición real en la barra (0.1 a 30 Hz) -->
+                            <div class="relative h-4 text-[10px] font-mono text-slate-500 mb-3 select-none">
+                                <span class="absolute left-0">0.1 Hz</span>
+                                <span class="absolute -translate-x-1/2" style="left: 33.11%;">10.0 Hz</span>
+                                <span class="absolute -translate-x-1/2" style="left: 66.55%;">20.0 Hz</span>
+                                <span class="absolute right-0">30.0 Hz</span>
+                            </div>
+
+                            <!-- Botones de Acceso Rápido de Frecuencia -->
+                            <div class="pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-1.5">
+                                <span class="text-[11px] font-mono text-slate-400">Acceso rápido:</span>
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <button type="button" onclick="syncRange('freq', 0.1)" class="px-2 py-1 rounded bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-[11px] font-mono transition-colors">
+                                        0.1 Hz
+                                    </button>
+                                    <button type="button" onclick="syncRange('freq', 1.59)" class="px-2.5 py-1 rounded bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 border border-violet-500/40 text-[11px] font-mono font-semibold transition-colors">
+                                        ⚡ 1.59 Hz (10 rad/s)
+                                    </button>
+                                    <button type="button" onclick="syncRange('freq', 10)" class="px-2 py-1 rounded bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-[11px] font-mono transition-colors">
+                                        10.0 Hz
+                                    </button>
+                                    <button type="button" onclick="syncRange('freq', 30)" class="px-2 py-1 rounded bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-[11px] font-mono transition-colors">
+                                        30.0 Hz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alerta de validación de ensayo -->
+                        <div id="aviso-ensayo" class="hidden mt-3 p-3 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-medium">
+                            ⚠️ Temperatura debe estar entre 20&deg;C y 80&deg;C. Frecuencia entre 0.1 y 30 Hz.
+                        </div>
+                    </div>
+
+                    <!-- Botón Principal de Ejecución -->
+                    <button type="submit" id="btn-predecir"
+                        class="mt-6 w-full py-4 px-5 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-400 hover:from-cyan-300 hover:to-amber-300 shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <span>Ejecutar Predicción IA</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- ================= SECCIÓN INFERIOR: RESULTADOS DESPLAZADOS DEBAJO DE PANELES 02 Y 03 ================= -->
+        <section class="flex flex-col gap-6">
+
+            <!-- FILA DE TARJETAS DE MODELOS PREDICTIVOS: DSR | MSCR | LAS -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+                <!-- 1. RESULTADO DSR (4 cols) -->
+                <div class="lg:col-span-4 lab-card p-5 border-t-2 border-t-cyan-400 flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="px-2.5 py-1 rounded-md bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold">
+                                    DSR
+                                </span>
+                                <div>
+                                    <h3 class="font-display font-bold text-base text-white">
+                                        Parámetro de Roderas
+                                    </h3>
+                                    <p class="text-xs text-slate-400">Rango: 20&deg;C &rarr; 80&deg;C</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                ● Activo (20–80&deg;C)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-baseline justify-between my-auto">
+                        <div>
+                            <span class="text-xs font-mono uppercase text-slate-400 block mb-1">Rutting Parameter (G* / sin &delta;)</span>
+                            <div class="flex items-baseline gap-2">
+                                <span id="val-dsr" class="font-mono font-bold text-3xl sm:text-4xl text-cyan-400 tracking-tight">--</span>
+                                <span class="font-mono text-sm text-slate-400">kPa</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. RESULTADOS MSCR (4 cols) -->
+                <div class="lg:col-span-4 lab-card p-5 border-t-2 border-t-amber-400 flex flex-col justify-between">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2.5 py-1 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-xs font-bold">
+                                MSCR
+                            </span>
+                            <div>
+                                <h3 class="font-display font-bold text-base text-white">
+                                    Parámetros MSCR (3.2 kPa)
+                                </h3>
+                                <p class="text-xs text-slate-400">Rango: 30&deg;C &rarr; 80&deg;C</p>
+                            </div>
+                        </div>
+                        <span id="badge-status-mscr" class="text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                            Ventana: 30&deg;C – 80&deg;C
+                        </span>
+                    </div>
+
+                    <!-- Tarjetas de métricas MSCR -->
+                    <div id="mscr-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-auto">
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-[11px] font-mono text-slate-400 block mb-1">J<sub>nr3.2</sub> (Compliance)</span>
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="val-mscr-jnr" class="font-mono font-bold text-2xl text-amber-400">--</span>
+                                <span class="font-mono text-xs text-slate-400">kPa<sup>&minus;1</sup></span>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-[11px] font-mono text-slate-400 block mb-1">R<sub>3.2</sub> (Recovery)</span>
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="val-mscr-r" class="font-mono font-bold text-2xl text-amber-400">--</span>
+                                <span class="font-mono text-xs text-slate-400">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aviso cuando T < 30°C -->
+                    <div id="mscr-warning-box" class="hidden my-auto p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3">
+                        <div class="text-xs text-amber-200">
+                            <span id="mscr-warning-text">⚠️ Entrenado para 30&deg;C – 80&deg;C</span>
+                        </div>
+                        <button type="button" onclick="ajustarTempYPredecir(60)" class="shrink-0 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-mono text-xs font-bold hover:bg-amber-400 transition-colors">
+                            Ir a 60&deg;C
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. RESULTADOS LAS (4 cols) -->
+                <div class="lg:col-span-4 lab-card p-5 border-t-2 border-t-violet-400 flex flex-col justify-between">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2.5 py-1 rounded-md bg-violet-500/15 border border-violet-500/30 text-violet-400 font-mono text-xs font-bold">
+                                LAS
+                            </span>
+                            <div>
+                                <h3 class="font-display font-bold text-base text-white">
+                                    Vida a Fatiga LAS
+                                </h3>
+                                <p class="text-xs text-slate-400">Rango: 20&deg;C &rarr; 25&deg;C</p>
+                            </div>
+                        </div>
+                        <span id="badge-status-las" class="text-xs font-mono px-2.5 py-1 rounded bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                            ● Activo (20–25&deg;C)
+                        </span>
+                    </div>
+
+                    <!-- Tarjetas de métricas LAS -->
+                    <div id="las-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-auto">
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-[11px] font-mono text-slate-400 block mb-1">N<sub>f,5.0%</sub> (5.0% strain)</span>
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="val-las-nf50" class="font-mono font-bold text-2xl text-violet-400">--</span>
+                                <span class="text-[11px] font-mono text-slate-500">cycles</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-[11px] font-mono text-slate-400 block mb-1">N<sub>f,2.5%</sub> (2.5% strain)</span>
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="val-las-nf25" class="font-mono font-bold text-2xl text-violet-400">--</span>
+                                <span class="text-[11px] font-mono text-slate-500">cycles</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aviso cuando T > 25°C -->
+                    <div id="las-warning-box" class="hidden my-auto p-3.5 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-between gap-3">
+                        <div class="text-xs text-violet-200">
+                            <span id="las-warning-text">⚠️ Entrenado para 20&deg;C – 25&deg;C</span>
+                        </div>
+                        <button type="button" onclick="ajustarTempYPredecir(25)" class="shrink-0 px-3 py-1.5 rounded-lg bg-violet-500 text-white font-mono text-xs font-bold hover:bg-violet-400 transition-colors">
+                            Ir a 25&deg;C
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= BANNER GRÁFICO DE 2 COLUMNAS (OPCIÓN A: RADAR + OPCIÓN B: BARRAS NORMALIZADAS) ================= -->
+            <div class="lab-card p-5 border-t-2 border-t-sky-500">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-5 pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="font-display font-bold text-base text-white">
+                            Síntesis Gráfica de Parámetros Reológicos Predichos
+                        </h3>
+                        <p class="text-xs text-slate-400">
+                            Combina y visualiza simultáneamente los 5 parámetros del gemelo digital (conserva los últimos valores válidos de LAS y MSCR para tu mezcla actual)
+                        </p>
+                    </div>
+                    <span class="text-xs font-mono px-2.5 py-1 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                        Vista Integrada Multivariable
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    
+                    <!-- COLUMNA 1 (OPCIÓN A): GRÁFICO DE RADAR PENTAGONAL -->
+                    <div class="lg:col-span-6 p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col items-center">
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold">
+                                A. Huella Reológica Global (Índice 0–100)
+                            </span>
+                            <span class="text-[11px] font-mono text-slate-500">Escala Log-Normalizada</span>
+                        </div>
+                        <div class="w-full h-72 flex items-center justify-center">
+                            <canvas id="radarReologicoChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA 2 (OPCIÓN B): BARRAS HORIZONTALES NORMALIZADAS / SEMÁFORO DE DESEMPEÑO -->
+                    <div class="lg:col-span-6 p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold">
+                                B. Espectro de Magnitudes Predichas
+                            </span>
+                            <span class="text-[11px] font-mono text-slate-500">Valor absoluto y nivel relativo</span>
+                        </div>
+
+                        <!-- Barra 1: G*/sin d -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300">1. DSR — G* / sin &delta;</span>
+                                <span id="bar-txt-dsr" class="text-cyan-400 font-bold">Sin datos</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                                <div id="bar-fill-dsr" class="h-full bg-cyan-400 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Barra 2: Jnr3.2 -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300">2. MSCR — Fluencia J<sub>nr3.2</sub> <span class="text-[10px] text-slate-500">(menor = mayor resistencia)</span></span>
+                                <span id="bar-txt-jnr" class="text-amber-400 font-bold">Sin datos (30–80&deg;C)</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                                <div id="bar-fill-jnr" class="h-full bg-amber-400 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Barra 3: R3.2 -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300">3. MSCR — Recuperación Elástica R<sub>3.2</sub></span>
+                                <span id="bar-txt-r32" class="text-amber-400 font-bold">Sin datos (30–80&deg;C)</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                                <div id="bar-fill-r32" class="h-full bg-amber-400 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Barra 4: LAS Nf 2.5% -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300">4. LAS — Vida a Fatiga N<sub>f,2.5%</sub></span>
+                                <span id="bar-txt-nf25" class="text-violet-400 font-bold">Sin datos (20–25&deg;C)</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                                <div id="bar-fill-nf25" class="h-full bg-violet-400 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Barra 5: LAS Nf 5.0% -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300">5. LAS — Vida a Fatiga N<sub>f,5.0%</sub></span>
+                                <span id="bar-txt-nf50" class="text-violet-400 font-bold">Sin datos (20–25&deg;C)</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                                <div id="bar-fill-nf50" class="h-full bg-violet-400 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= HISTORIAL DE PREDICCIONES DE LA SESIÓN ================= -->
+            <div class="lab-card p-5">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <div>
+                        <h3 class="font-display font-semibold text-sm uppercase tracking-wider text-slate-200">
+                            Historial de Predicciones (MATLAB)
+                        </h3>
+                        <p class="text-xs text-slate-400">Registro comparativo de las consultas ejecutadas sobre Betún B50/70 RLESA</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="exportarHistorialCSV()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition-colors">
+                            ⬇ Exportar CSV
+                        </button>
+                        <button type="button" onclick="limpiarHistorial()" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-800 text-xs font-mono transition-colors">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs font-mono">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 bg-slate-900/60">
+                                <th class="py-2.5 px-2">#</th>
+                                <th class="py-2.5 px-2">Ce / CaCO<sub>3</sub> / ReSe / FR</th>
+                                <th class="py-2.5 px-2">AD4 / BO</th>
+                                <th class="py-2.5 px-2">Condición</th>
+                                <th class="py-2.5 px-2 text-cyan-400">G*/sin &delta; (kPa)</th>
+                                <th class="py-2.5 px-2 text-amber-400">J<sub>nr3.2</sub> / R<sub>3.2</sub></th>
+                                <th class="py-2.5 px-2 text-violet-400">N<sub>f,5.0%</sub> / N<sub>f,2.5%</sub></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-historial-body" class="divide-y divide-slate-800/70 text-slate-300">
+                            <tr>
+                                <td colspan="7" class="py-6 text-center text-slate-500 font-sans">
+                                    Aún no se han ejecutado predicciones. Pulsa "Ejecutar Predicción IA" para consultar MATLAB.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ================= PIE DE PÁGINA ================= -->
+    <footer class="border-t border-slate-800/80 py-4 mt-8 text-center text-xs text-slate-500 font-mono">
+        <div class="max-w-[1440px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span>Reolog.IA — Gemelo Digital para Betunes Asfálticos Modificados (Ligante Base: Betún B50/70 RLESA)</span>
+            <span>DSR (20–80&deg;C) &bull; MSCR (30–80&deg;C) &bull; LAS (20–25&deg;C)</span>
+        </div>
+    </footer>
+
+    <!-- ================= LÓGICA JAVASCRIPT ================= -->
+    <script>
+        let historialEnsayos = [];
+        let radarChart = null;
+
+        // Estado acumulado para los gráficos (permite ver LAS + MSCR juntos al cambiar de 25°C a 60°C)
+        let estadoGrafico = {
+            dsr: null,
+            jnr: null,
+            r32: null,
+            nf25: null,
+            nf50: null
+        };
+
+        // Detectar servidor API automáticamente (permite localhost, IP de red local o túnel Ngrok)
+        function obtenerBaseUrlAPI() {
+            const guardada = localStorage.getItem('reologia_api_url');
+            if (guardada) return guardada.replace(/\/+$/, '');
+            if (window.location.protocol.startsWith('http') && window.location.hostname !== '') {
+                 const puerto = window.location.port ? `:${window.location.port}` : '';
+                return `${window.location.protocol}//${window.location.hostname}${puerto}`;
+            }
+             return 'http://127.0.0.1:5000';
+        }
+
+        function cambiarServidorAPI() {
+            const actual = obtenerBaseUrlAPI();
+            const nueva = prompt(
+                "Introduce la dirección del servidor Python/MATLAB (ej. http://127.0.0.1:5000, una IP local como http://192.168.1.40:5000 o tu enlace de Ngrok):",
+                actual
+            );
+            if (nueva && nueva.trim() !== "") {
+                const limpia = nueva.trim().replace(/\/+$/, '');
+                localStorage.setItem('reologia_api_url', limpia);
+                document.getElementById('lbl-endpoint-short').textContent = limpia.replace(/^https?:\/\//, '');
+            }
+        }
+
+        function syncRange(id, val) {
+            document.getElementById(id).value = val;
+            validarFormulario();
+        }
+
+        function syncInput(id, val) {
+            const rangeEl = document.getElementById(id + '-range');
+            if (rangeEl) rangeEl.value = val;
+            validarFormulario();
+        }
+
+        function seleccionarEstado(nuevoEstado) {
+            const selectEl = document.getElementById('estado');
+            selectEl.value = nuevoEstado;
+
+            const btnOrig = document.getElementById('btn-estado-orig');
+            const btnUsat = document.getElementById('btn-estado-usat');
+
+            if (nuevoEstado === 'Original') {
+                btnOrig.className = "py-2.5 px-3 rounded-md text-xs font-semibold transition-all bg-cyan-500 text-slate-950 shadow";
+                btnUsat.className = "py-2.5 px-3 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-white";
+            } else {
+                btnUsat.className = "py-2.5 px-3 rounded-md text-xs font-semibold transition-all bg-amber-500 text-slate-950 shadow";
+                btnOrig.className = "py-2.5 px-3 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-white";
+            }
+            validarFormulario();
+        }
+
+        function validarFormulario() {
+            let ce = parseFloat(document.getElementById('ce').value) || 0;
+            let caco3 = parseFloat(document.getElementById('caco3').value) || 0;
+            let rese = parseFloat(document.getElementById('rese').value) || 0;
+            let temp = parseFloat(document.getElementById('temp').value) || 0;
+            let freq = parseFloat(document.getElementById('freq').value) || 0;
+
+            let sumaOtros = ce + caco3 + rese;
+            let frCalculado = 100 - sumaOtros;
+
+            let campoFR = document.getElementById('fr');
+            let avisoMastico = document.getElementById('aviso-mastico');
+            let avisoEnsayo = document.getElementById('aviso-ensayo');
+            let btn = document.getElementById('btn-predecir');
+            let badgeSuma = document.getElementById('badge-suma-vol');
+
+            let esMasticoValido = true;
+            let esEnsayoValido = true;
+
+            if (frCalculado < 0 || ce < 0 || caco3 < 0 || rese < 0) {
+                campoFR.value = "0.0";
+                avisoMastico.classList.remove('hidden');
+                badgeSuma.textContent = `Exceso: ${(sumaOtros).toFixed(1)}%`;
+                badgeSuma.className = "text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                esMasticoValido = false;
+            } else {
+                campoFR.value = frCalculado.toFixed(1);
+                avisoMastico.classList.add('hidden');
+                badgeSuma.textContent = "Balance = 100.0%";
+                badgeSuma.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
+            }
+
+            let frSafe = Math.max(0, frCalculado);
+            let totalSafe = Math.max(100, sumaOtros);
+            document.getElementById('bar-seg-ce').style.width = `${(ce / totalSafe) * 100}%`;
+            document.getElementById('bar-seg-caco3').style.width = `${(caco3 / totalSafe) * 100}%`;
+            document.getElementById('bar-seg-rese').style.width = `${(rese / totalSafe) * 100}%`;
+            document.getElementById('bar-seg-fr').style.width = `${(frSafe / totalSafe) * 100}%`;
+
+            document.getElementById('bar-label-ce').textContent = `${ce.toFixed(1)}%`;
+            document.getElementById('bar-label-caco3').textContent = `${caco3.toFixed(1)}%`;
+            document.getElementById('bar-label-rese').textContent = `${rese.toFixed(1)}%`;
+            document.getElementById('bar-label-fr').textContent = `${frSafe.toFixed(1)}%`;
+
+            if (temp < 20 || temp > 80 || freq < 0.1 || freq > 30) {
+                avisoEnsayo.classList.remove('hidden');
+                esEnsayoValido = false;
+            } else {
+                avisoEnsayo.classList.add('hidden');
+            }
+
+            actualizarPillsTermicos(temp);
+
+            btn.disabled = !(esMasticoValido && esEnsayoValido);
+            return esMasticoValido && esEnsayoValido;
+        }
+
+        function actualizarPillsTermicos(temp) {
+            const pillDsr = document.getElementById('pill-dsr');
+            const pillLas = document.getElementById('pill-las');
+            const pillMscr = document.getElementById('pill-mscr');
+            const hint = document.getElementById('temp-zone-hint');
+
+            const dsrOk = temp >= 20 && temp <= 80;
+            const lasOk = temp >= 20 && temp <= 25;
+            const mscrOk = temp >= 30 && temp <= 80;
+
+            pillDsr.className = dsrOk
+                ? "px-2 py-1.5 rounded border text-center transition-all bg-cyan-500/15 border-cyan-500/50 text-cyan-300 font-semibold"
+                : "px-2 py-1.5 rounded border text-center transition-all bg-slate-900 border-slate-800 text-slate-500";
+            pillDsr.innerHTML = `DSR (20–80&deg;C) ${dsrOk ? '✓' : '✕'}`;
+
+            pillLas.className = lasOk
+                ? "px-2 py-1.5 rounded border text-center transition-all bg-violet-500/15 border-violet-500/50 text-violet-300 font-semibold"
+                : "px-2 py-1.5 rounded border text-center transition-all bg-slate-900 border-slate-800 text-slate-500";
+            pillLas.innerHTML = `LAS (20–25&deg;C) ${lasOk ? '✓' : '✕'}`;
+
+            pillMscr.className = mscrOk
+                ? "px-2 py-1.5 rounded border text-center transition-all bg-amber-500/15 border-amber-500/50 text-amber-300 font-semibold"
+                : "px-2 py-1.5 rounded border text-center transition-all bg-slate-900 border-slate-800 text-slate-500";
+            pillMscr.innerHTML = `MSCR (30–80&deg;C) ${mscrOk ? '✓' : '✕'}`;
+
+            if (lasOk) {
+                hint.textContent = "LAS + DSR activos";
+                hint.className = "text-violet-400";
+            } else if (mscrOk) {
+                hint.textContent = "MSCR + DSR activos";
+                hint.className = "text-amber-400";
+            } else if (temp > 25 && temp < 30) {
+                hint.textContent = "Solo DSR activo (26–29°C)";
+                hint.className = "text-cyan-400";
+            } else {
+                hint.textContent = "Fuera de rango (20–80°C)";
+                hint.className = "text-rose-400";
+            }
+        }
+
+        function ajustarTempYPredecir(nuevaTemp) {
+            syncRange('temp', nuevaTemp);
+            ejecutarPrediccionReal();
+        }
+
+        async function ejecutarPrediccionReal() {
+            if (!validarFormulario()) return;
+
+            const datos = {
+                ce: parseFloat(document.getElementById('ce').value) || 0,
+                fr: parseFloat(document.getElementById('fr').value) || 0,
+                caco3: parseFloat(document.getElementById('caco3').value) || 0,
+                rese: parseFloat(document.getElementById('rese').value) || 0,
+                ad4: parseFloat(document.getElementById('ad4').value) || 0,
+                bo: parseFloat(document.getElementById('bo').value) || 0,
+                temp: parseFloat(document.getElementById('temp').value) || 25,
+                freq: parseFloat(document.getElementById('freq').value) || 10,
+                estado: document.getElementById('estado').value
+            };
+
+            const statusTitle = document.getElementById('res-status-title');
+            const statusDesc = document.getElementById('res-status-desc');
+            const spinner = document.getElementById('res-spinner');
+            const caja = document.getElementById('caja-resultado');
+            const baseUrl = obtenerBaseUrlAPI();
+
+            spinner.classList.remove('hidden');
+            caja.className = "w-full lab-card p-4 border-l-4 border-l-amber-400 flex flex-wrap items-center justify-between gap-3";
+            statusTitle.textContent = "⏳ Consultando gemelos digitales en MATLAB...";
+            statusTitle.className = "text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold";
+            statusDesc.textContent = `Calculando predicción en ${baseUrl}/predecir para T = ${datos.temp}°C, f = ${datos.freq} Hz, Estado = ${datos.estado}...`;
+
+            try {
+                const respuesta = await fetch(`${baseUrl}/predecir`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                const resultado = await respuesta.json();
+                spinner.classList.add('hidden');
+
+                if (resultado.exito) {
+                    document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+                    document.getElementById('status-text').innerHTML = `Conectado: Motor MATLAB (<span id="lbl-endpoint-short">${baseUrl.replace(/^https?:\/\//, '')}</span>)`;
+
+                    caja.className = "w-full lab-card p-4 border-l-4 border-l-emerald-400 flex flex-wrap items-center justify-between gap-3";
+                    statusTitle.textContent = "📊 Resultados de Predicción Reológica Completados";
+                    statusTitle.className = "text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold";
+                    statusDesc.textContent = `Mástico [Ce: ${datos.ce}%, CaCO3: ${datos.caco3}%, ReSe: ${datos.rese}%, FR: ${datos.fr}%] • Aditivos [AD4: ${datos.ad4}%, BO: ${datos.bo}%] • ${datos.estado} (${datos.temp}°C, ${datos.freq} Hz)`;
+                    document.getElementById('res-timestamp').textContent = new Date().toLocaleTimeString();
+
+                    renderizarResultadosEnTarjetas(resultado);
+                    actualizarPanelGraficoDual(resultado);
+                    agregarAlHistorial(datos, resultado);
+                } else {
+                    caja.className = "w-full lab-card p-4 border-l-4 border-l-rose-500 flex flex-wrap items-center justify-between gap-3";
+                    statusTitle.textContent = "⚠️ Error en la Ejecución de MATLAB";
+                    statusTitle.className = "text-xs font-mono uppercase tracking-wider text-rose-400 font-semibold";
+                    statusDesc.textContent = resultado.detalle
+                        ? `${resultado.error}: ${resultado.detalle}`
+                        : (resultado.error || "Error al ejecutar la predicción en MATLAB.");
+                }
+
+            } catch (err) {
+                spinner.classList.add('hidden');
+                document.getElementById('status-dot').className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+                document.getElementById('status-text').innerHTML = `Sin conexión (<span id="lbl-endpoint-short">${baseUrl.replace(/^https?:\/\//, '')}</span>)`;
+
+                caja.className = "w-full lab-card p-4 border-l-4 border-l-rose-500 flex flex-wrap items-center justify-between gap-3";
+                statusTitle.textContent = "❌ Error de conexión con el servidor Python";
+                statusTitle.className = "text-xs font-mono uppercase tracking-wider text-rose-400 font-semibold";
+                statusDesc.textContent = `No se pudo conectar con ${baseUrl}/predecir. Verifica que 'app_v2_2.py' esté en ejecución.`;
+            }
+        }
+
+        function renderizarResultadosEnTarjetas(resultado) {
+            // 1. DSR
+            const dsrVal = Number(resultado.dsr.valor);
+            document.getElementById('val-dsr').textContent = dsrVal.toFixed(4);
+
+            // 2. MSCR
+            const mscrCards = document.getElementById('mscr-cards-container');
+            const mscrWarn = document.getElementById('mscr-warning-box');
+            const badgeMscr = document.getElementById('badge-status-mscr');
+
+            if (resultado.mscr && resultado.mscr.valido) {
+                mscrCards.classList.remove('hidden');
+                mscrWarn.classList.add('hidden');
+                badgeMscr.className = "text-xs font-mono px-2.5 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30";
+                badgeMscr.innerHTML = "● Activo (30–80&deg;C)";
+
+                document.getElementById('val-mscr-jnr').textContent = Number(resultado.mscr.jnr).toFixed(4);
+                document.getElementById('val-mscr-r').textContent = Number(resultado.mscr.r).toFixed(4);
+            } else {
+                mscrCards.classList.add('hidden');
+                mscrWarn.classList.remove('hidden');
+                document.getElementById('mscr-warning-text').textContent = (resultado.mscr && resultado.mscr.mensaje) || "⚠️ No disponible: entrenado para 30°C – 80°C";
+                badgeMscr.className = "text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700";
+                badgeMscr.innerHTML = "No disponible (30–80&deg;C)";
+            }
+
+            // 3. LAS
+            const lasCards = document.getElementById('las-cards-container');
+            const lasWarn = document.getElementById('las-warning-box');
+            const badgeLas = document.getElementById('badge-status-las');
+
+            if (resultado.las && resultado.las.valido) {
+                lasCards.classList.remove('hidden');
+                lasWarn.classList.add('hidden');
+                badgeLas.className = "text-xs font-mono px-2.5 py-1 rounded bg-violet-500/15 text-violet-300 border border-violet-500/30";
+                badgeLas.innerHTML = "● Activo (20–25&deg;C)";
+
+                document.getElementById('val-las-nf50').textContent = Number(resultado.las.nf50).toFixed(4);
+                document.getElementById('val-las-nf25').textContent = Number(resultado.las.nf25).toFixed(4);
+            } else {
+                lasCards.classList.add('hidden');
+                lasWarn.classList.remove('hidden');
+                document.getElementById('las-warning-text').textContent = (resultado.las && resultado.las.mensaje) || "⚠️ No disponible: entrenado para 20°C – 25°C";
+                badgeLas.className = "text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700";
+                badgeLas.innerHTML = "No disponible (20–25&deg;C)";
+            }
+        }
+
+        // Inicializar y actualizar el Banner Gráfico Dual (Opciones A y B)
+        function inicializarRadarChart() {
+            const ctx = document.getElementById('radarReologicoChart').getContext('2d');
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'G*/sin δ (Rigidez)',
+                        'Resistencia Fluencia (1/Jnr3.2)',
+                        'Recuperación (R3.2)',
+                        'Fatiga Nf,2.5%',
+                        'Fatiga Nf,5.0%'
+                    ],
+                    datasets: [{
+                        label: 'Desempeño Reológico Normalizado (0-100)',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(14, 165, 233, 0.22)',
+                        borderColor: '#0EA5E9',
+                        pointBackgroundColor: ['#0EA5E9', '#F59E0B', '#F59E0B', '#8B5CF6', '#8B5CF6'],
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            beginAtZero: true,
+                            angleLines: { color: 'rgba(148, 163, 184, 0.15)' },
+                            grid: { color: 'rgba(148, 163, 184, 0.15)' },
+                            pointLabels: {
+                                color: '#CBD5E1',
+                                font: { family: 'JetBrains Mono', size: 11 }
+                            },
+                            ticks: {
+                                display: false,
+                                stepSize: 25
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function clampPct(val) {
+            return Math.max(4, Math.min(100, val));
+        }
+
+        function actualizarPanelGraficoDual(resultado) {
+            // Actualizar valores acumulados
+            if (resultado.dsr && resultado.dsr.valor != null) {
+                estadoGrafico.dsr = Number(resultado.dsr.valor);
+            }
+            if (resultado.mscr && resultado.mscr.valido) {
+                estadoGrafico.jnr = Number(resultado.mscr.jnr);
+                estadoGrafico.r32 = Number(resultado.mscr.r);
+            }
+            if (resultado.las && resultado.las.valido) {
+                estadoGrafico.nf25 = Number(resultado.las.nf25);
+                estadoGrafico.nf50 = Number(resultado.las.nf50);
+            }
+
+            // Cálculo de índices normalizados (0-100) para visualización conjunta
+            const scoreDsr = estadoGrafico.dsr != null
+                ? clampPct(((Math.log10(Math.max(0.01, estadoGrafico.dsr)) + 1) / 5.5) * 100)
+                : 0;
+
+            // Para Jnr3.2: menor fluencia significa mejor resistencia (escala invertida de 0.01 a 10 kPa^-1)
+            const scoreJnr = estadoGrafico.jnr != null
+                ? clampPct(((1.0 - Math.log10(Math.max(0.01, estadoGrafico.jnr))) / 3.0) * 100)
+                : 0;
+
+            const scoreR32 = estadoGrafico.r32 != null
+                ? clampPct(estadoGrafico.r32)
+                : 0;
+
+            const scoreNf25 = estadoGrafico.nf25 != null
+                ? clampPct((Math.log10(Math.max(1, estadoGrafico.nf25)) / 6.5) * 100)
+                : 0;
+
+            const scoreNf50 = estadoGrafico.nf50 != null
+                ? clampPct((Math.log10(Math.max(1, estadoGrafico.nf50)) / 5.5) * 100)
+                : 0;
+
+            // 1. Actualizar Radar (Opción A)
+            if (radarChart) {
+                radarChart.data.datasets[0].data = [
+                    Number(scoreDsr.toFixed(1)),
+                    Number(scoreJnr.toFixed(1)),
+                    Number(scoreR32.toFixed(1)),
+                    Number(scoreNf25.toFixed(1)),
+                    Number(scoreNf50.toFixed(1))
+                ];
+                radarChart.update();
+            }
+
+            // 2. Actualizar Barras Horizontales (Opción B)
+            if (estadoGrafico.dsr != null) {
+                document.getElementById('bar-txt-dsr').textContent = `${estadoGrafico.dsr.toFixed(4)} kPa`;
+                document.getElementById('bar-fill-dsr').style.width = `${scoreDsr}%`;
+            }
+            if (estadoGrafico.jnr != null) {
+                document.getElementById('bar-txt-jnr').textContent = `${estadoGrafico.jnr.toFixed(4)} kPa⁻¹`;
+                document.getElementById('bar-fill-jnr').style.width = `${scoreJnr}%`;
+            }
+            if (estadoGrafico.r32 != null) {
+                document.getElementById('bar-txt-r32').textContent = `${estadoGrafico.r32.toFixed(2)} %`;
+                document.getElementById('bar-fill-r32').style.width = `${scoreR32}%`;
+            }
+            if (estadoGrafico.nf25 != null) {
+                document.getElementById('bar-txt-nf25').textContent = `${estadoGrafico.nf25.toFixed(2)} cycles`;
+                document.getElementById('bar-fill-nf25').style.width = `${scoreNf25}%`;
+            }
+            if (estadoGrafico.nf50 != null) {
+                document.getElementById('bar-txt-nf50').textContent = `${estadoGrafico.nf50.toFixed(2)} cycles`;
+                document.getElementById('bar-fill-nf50').style.width = `${scoreNf50}%`;
+            }
+        }
+
+        function agregarAlHistorial(datos, resultado) {
+            const item = {
+                id: historialEnsayos.length + 1,
+                ...datos,
+                dsr: Number(resultado.dsr.valor),
+                mscr_valido: Boolean(resultado.mscr && resultado.mscr.valido),
+                jnr: resultado.mscr && resultado.mscr.valido ? Number(resultado.mscr.jnr) : null,
+                r32: resultado.mscr && resultado.mscr.valido ? Number(resultado.mscr.r) : null,
+                las_valido: Boolean(resultado.las && resultado.las.valido),
+                nf50: resultado.las && resultado.las.valido ? Number(resultado.las.nf50) : null,
+                nf25: resultado.las && resultado.las.valido ? Number(resultado.las.nf25) : null
+            };
+            historialEnsayos.unshift(item);
+            renderizarTablaHistorial();
+        }
+
+        function renderizarTablaHistorial() {
+            const tbody = document.getElementById('tabla-historial-body');
+            if (historialEnsayos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 font-sans">Aún no se han ejecutado predicciones. Pulsa "Ejecutar Predicción IA" para consultar MATLAB.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = historialEnsayos.map(item => `
+                <tr class="hover:bg-slate-800/40 transition-colors">
+                    <td class="py-2.5 px-2 font-bold text-slate-400">#${item.id}</td>
+                    <td class="py-2.5 px-2">${item.ce} / ${item.caco3} / ${item.rese} / <span class="text-emerald-400">${item.fr}%</span></td>
+                    <td class="py-2.5 px-2">${item.ad4}% / ${item.bo}%</td>
+                    <td class="py-2.5 px-2">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200">${item.estado}</span>
+                        <span class="text-slate-400 ml-1">${item.temp}&deg;C &bull; ${item.freq} Hz</span>
+                    </td>
+                    <td class="py-2.5 px-2 font-bold text-cyan-400">${item.dsr.toFixed(4)}</td>
+                    <td class="py-2.5 px-2 text-amber-300">
+                        ${item.mscr_valido ? `${item.jnr.toFixed(4)} kPa<sup>&minus;1</sup> /${item.r32.toFixed(4)}%` : '<span class="text-slate-600">No disp. (30–80&deg;C)</span>'}
+                    </td>
+                    <td class="py-2.5 px-2 text-violet-300">
+                        ${item.las_valido ? `${item.nf50.toFixed(2)} /${item.nf25.toFixed(2)}` : '<span class="text-slate-600">No disp. (20–25&deg;C)</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function limpiarHistorial() {
+            historialEnsayos = [];
+            renderizarTablaHistorial();
+        }
+
+        function exportarHistorialCSV() {
+            if (historialEnsayos.length === 0) return;
+            const headers = ["ID", "Betun_Base", "Pct_Ce", "Pct_CaCO3", "Pct_ReSe", "Pct_FR", "Pct_AD4", "Pct_BO", "Estado", "Temp_C", "Freq_Hz", "DSR_kPa", "MSCR_Jnr32", "MSCR_R32_Pct", "LAS_Nf50", "LAS_Nf25"];
+            const rows = historialEnsayos.map(i => [
+                i.id, "B50/70_RLESA", i.ce, i.caco3, i.rese, i.fr, i.ad4, i.bo, i.estado, i.temp, i.freq,
+                i.dsr.toFixed(4),
+                i.mscr_valido ? i.jnr.toFixed(4) : "N/A",
+                i.mscr_valido ? i.r32.toFixed(4) : "N/A",
+                i.las_valido ? i.nf50.toFixed(4) : "N/A",
+                i.las_valido ? i.nf25.toFixed(4) : "N/A"
+            ]);
+
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + headers.join(",") + "\n" 
+                + rows.map(e => e.join(",")).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "ReologIA_Predicciones_B50_70_RLESA.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+            } else {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlActual = obtenerBaseUrlAPI();
+            document.getElementById('lbl-endpoint-short').textContent = urlActual.replace(/^https?:\/\//, '');
+            validarFormulario();
+            inicializarRadarChart();
+        });
+    </script>
+</body>
+</html>
